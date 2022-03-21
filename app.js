@@ -72,6 +72,10 @@ const routeConfig = {
               case 'chaininfo':
                 return { status: 200, payload: await getNetworkStats(10) };
                 break;
+              case 'supply':
+                return { status: 200, payload: await getSupply() };
+                break;
+  
               default:
                 return ('Failed');
             }
@@ -175,5 +179,36 @@ async function getNetworkStats(
   };
 }
 
+async function getSupply() {
+  let coins=0;
+  let i=0;
+
+  let monitary_block= [1000000, 1000000, 1700000,300000,800000,200000,1000000,1000000,1000000,1000000,150000, 600000, 250000, 1000000];
+  let monitary_reward= [11, 9.4, 9.4, 8.1, 5.8, 4.7, 3.45, 2.45, 1.9, 11, 1.3, 1.3, 1.05, 1];
+  let monitary_special= [0, 0, 0, 0, 0, 0, 0, 0, 0, 22000000, 0,0, 0, 0];
+  
+  await web3.eth.getBlockNumber()
+    .then((result)=> {
+      for (i=0; i<monitary_block.length; i++) {
+        if (result-monitary_block[i]<0)
+          break;
+        else {
+          result-=monitary_block[i];
+          coins+=monitary_reward[i]*monitary_block[i]+monitary_special[i];
+        }
+        console.log(coins);
+      }
+      coins+=result*monitary_reward[i]+monitary_special[i];
+      console.log(coins);
+      })
+    .catch((error)=>{
+      logger.error("#app.getNetworkStats: Error %s", error);
+    })
+  return {
+    "CurrentSupply": coins,
+  }
+  
+  
+}
 
 module.exports = app;
