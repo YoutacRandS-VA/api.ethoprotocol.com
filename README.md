@@ -5,7 +5,7 @@ This server will create two ports
 - 8080: Rest API
 
 # Install
-```npm install`´´
+```npm install```
 
 # Execution
 ```node bin/www```
