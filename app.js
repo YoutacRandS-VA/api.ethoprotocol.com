@@ -218,7 +218,7 @@ async function getNodeLocations() {
   
   let sql = 'select * from node_coordinates';
   
-  let prevrow = await pool.query(sql).then((rows)=> {
+  let prevrow = await global.pool.query(sql).then((rows)=> {
     let response=[];
     let i;
     for (i=0;i<rows.length;i++) {
