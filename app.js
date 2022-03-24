@@ -7,6 +7,8 @@ const NodeRestServer = require('node-rest-server'); // ES5
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider('https://rpc.ethoprotocol.com'));
 
+const Database=require('./database');
+global.pool=new Database();
 
 var indexRouter = require('./routes/index');
 
@@ -72,6 +74,9 @@ const routeConfig = {
                 break;
               case 'supply':
                 return { status: 200, payload: await getSupply() };
+                break;
+              case 'node_locations':
+                return { status: 200, payload: await getNodeLocations() };
                 break;
   
               default:
@@ -208,5 +213,24 @@ async function getSupply() {
   
   
 }
+
+async function getNodeLocations() {
+  
+  let sql = 'select * from node_coordinates';
+  logger.info("#server.app.getNodeLocation: Fetching data set %s", sql);
+  
+  let prevrow = await pool.query(sql).then((rows)=> {
+    let response=[];
+    let i;
+    for (i=0;i<rows.length;i++) {
+      response.push(rows[i]);
+    }
+    return(JSON.stringify(response));
+  });
+  
+  return(prevrow);
+  
+}
+
 
 module.exports = app;
