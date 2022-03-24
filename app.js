@@ -217,7 +217,6 @@ async function getSupply() {
 async function getNodeLocations() {
   
   let sql = 'select * from node_coordinates';
-  logger.info("#server.app.getNodeLocation: Fetching data set %s", sql);
   
   let prevrow = await pool.query(sql).then((rows)=> {
     let response=[];
