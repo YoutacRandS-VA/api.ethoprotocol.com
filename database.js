@@ -1,9 +1,7 @@
 // Establishing connection to the database
+var logger = require("./logger");
 var mysql = require('mysql');
 var util= require('util');
-console.log("Reading config data");
-var config = require("./config")();
-
 
 class Database {
     constructor() {
@@ -18,17 +16,16 @@ class Database {
         });
     }
     mysqlSecElapsed(timestr) {
-        console.log(timestr);
+        if (timestr===null)
+            return(1000);
         var date = new Date();
-        var now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-            date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+        var date_sec = date.getTime();
+        var timestr_sec = timestr;
 
-        // Split timestamp into [ Y, M, D, h, m, s ]
-        const t = timestr.toString().split(/[- :]/);
-
-        // Apply each element to the Date function
-        const mysqlDate = Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]);
-        return((now_utc-mysqlDate)/1000);
+        console.log(date_sec);
+        console.log(timestr_sec);
+        console.log((timestr_sec-date_sec)/1000);
+        return((timestr_sec-date_sec)/1000);
     }
     mysqlNow() {
         var date;
@@ -41,79 +38,82 @@ class Database {
             ('00' + date.getUTCSeconds()).slice(-2);
         return(date);
     }
-    query( sql, arg) {
-        this.connection.query(sql, arg, (error,rows) => {
-            if (error) {
-                if (debugon)
-                    console.log('DEBUG >>> ', error);
-                cb(error,null);
-            } else {
-                cb(null, rows);
-            }
-        });
+    query( sql, args ) {
+        logger.info('#server.database.query: SQL: %s',sql);
+        return new Promise( ( resolve, reject ) => {
+            this.connection.query( sql, args, ( err, rows ) => {
+                if ( err )
+                    return reject( err );
+                resolve( rows );
+            } );
+        } );
     }
     queryuser( userId, cb) {
-        var sql = "SELECT * FROM user WHERE id=" + userId;
-        this.connection.query(sql, async (error,rows,fields) => {
-            if (error) {
-                if (debugon)
-                    console.log('DEBUG >>> '+error);
-                cb(error,null);
-            } else {
-                if (rows.length == 0) {
-                    if (debugon)
-                        console.log('>>>> DEBUG fn=(queryuser): Could not find user');
-                    cb("Coudn't find userid " + userId, null);
-                }
-                if (rows.length > 1) {
-                    if (debugon)
-                        console.log('>>>> DEBUG fn=(queryuser): Database corrupt? Two entries');
-                    cb("Found too many entries for userid " + userId, null);
-                }
-                // Return rows
-                if (rows.length==1)
-                    cb(null, rows);
-            }
+        return new Promise((resolve, reject) => {
+            var sql = "SELECT *, TIMESTAMPDIFF(SECOND, blockchaintransact, UTC_TIMESTAMP()) AS blockchaintransactsecs FROM user WHERE id=" + userId;
+
+            this.query(sql)
+                .then(async function (rows) {
+                    if (rows.length == 0) {
+                        logger.error('#server.database.queryuser: Could not find user');
+                        reject("Coudn't find userid " + userId);
+                    }
+                    if (rows.length > 1) {
+                        logger.error('#server.database.queryuser: Multiple userids found');
+                        reject("Multiple IDs found for: " + userId);
+                    }
+                    resolve(rows);
+                })
+                .catch(function (error) {
+                    logger.error('#server.database.queryuser: Issue with query: ', sql);
+                    reject(err);
+                })
+        })
+    }
+
+    queryaddr( userId, coin ,cb) {
+        return new Promise((resolve, reject) => {
+            var sql = "SELECT * FROM user WHERE id=" + userId;
+            this.query(sql)
+                .then(function (rows) {
+                    if (rows.length == 0) {
+                        logger.error('#server.database.queryaddr: Could not find userid: %s', userId);
+                        reject("Coudn't find userid " + userId);
+                    }
+                    if (rows.length > 1) {
+                        logger.error('#server.database.queryaddr: Severe problem with userid: %s, %s', userId, rows.length);
+                        reject("Too many userids for " + userId);
+                    }
+                    // Check if the ath address is valid
+                    if (rows[0].athaddr === "") {
+                        athGetAddress(coin)
+                            .then(function (address) {
+                                var vsql = "UPDATE user SET athaddr='" + address + "' WHERE id=" + userId;
+                                this.query(vsql)
+                                    .then(function(rows1) {
+                                        return(address);
+                                    })
+                                    .catch(function(error) {
+                                        return(error);
+                                    })
+                                });
+                    } else {
+                        switch (coin) {
+                            case "ATH":
+                                resolve(rows[0].athaddr);
+                                break;
+                            case "ETHO":
+                                resolve(rows[0].ethoaddr);
+                                break;
+                        }
+                    }
+                })
+                .catch(function (error) {
+                    return(error);
+                })
         });
     }
-    queryathaddr( userId, cb) {
-        var sql = "SELECT * FROM user WHERE id=" + userId;
-        this.connection.query(sql, async (error,rows,fields) => {
-            if (error) {
-                if (debugon)
-                    console.log('DEBUG >>> '+error);
-                cb(error,null);
-            } else {
-                if (rows.length == 0) {
-                    if (debugon)
-                        console.log('DEBUG >>> Empty result, create new address for this user<<<');
-                    cb("Coudn't find userid " + userId, null);
-                }
-                if (rows.length > 1) {
-                    if (debugon)
-                        console.log('DEBUG >>> Database corrupt? Two entries<<<');
-                    cb("Found too many entries for userid " + userId, null);
-                }
-                // Check if the ath address is valid
-                if (rows[0].athaddr==="") {
-                    await athGetAddress(async(error,athaddress) => {
-                        var vsql = "UPDATE user SET athaddr='" + athaddress + "' WHERE id=" + userId;
-                        await this.connection.query(vsql, async (error, rows1, fields) => {
-                            if (error) {
-                                if (debugon)
-                                    console.log('DEBUG >>> ' + error);
-                                cb(error, null);
-                            } else {
-                                rows[0].athaddr = athaddress;
-                                cb(null, rows);
-                            }
-                        });
-                    });
-                }
-                cb(null, rows);
-            }
-        });
-    }
+
     logging(userid, str) {
         return new Promise( ( resolve, reject ) => {
             var date;
@@ -136,6 +136,10 @@ class Database {
             }
         });
     }
+    escape(arg) {
+        return(this.connection.escape(arg));
+    }
+
 }
 
 module.exports = Database;
