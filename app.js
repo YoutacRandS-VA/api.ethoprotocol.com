@@ -78,6 +78,9 @@ const routeConfig = {
               case 'node_locations':
                 return { status: 200, payload: await getNodeLocations() };
                 break;
+              case 'network_stats':
+                return { status: 200, payload: await getNetworkStats() };
+                break;
   
               default:
                 return ('Failed');
@@ -218,18 +221,42 @@ async function getNodeLocations() {
   
   let sql = 'select * from node_coordinates';
   
-  let prevrow = await global.pool.query(sql).then((rows)=> {
+  let res = await global.pool.query(sql).then((rows)=> {
     let response=[];
     let i;
     for (i=0;i<rows.length;i++) {
       response.push(rows[i]);
     }
-    return(JSON.stringify(response));
+    return((response));
   });
   
-  return(prevrow);
+  return(res);
   
 }
 
+async function getNetworkStats() {
+  
+  let sql = "select * from livestats";
+  let sql2 = "select * from reward_tracker order by id DESC LIMIT 0, 1";
+  
+  let res = await global.pool.query(sql).then((rows)=> {
+    let res = await global.pool.query(sql2).then((rows2) => {
+    
+      let networkStorageAvailable = (parseInt(row.gn_count) * 78 + parseInt(row.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
+    
+      return {
+        "activeUploadContracts": rows.pin_count,
+        "networkStorageAvailable": networkStorageAvailable,
+        "totalNetworkStorageUs": networkStorageAvailable / 101.649142,
+        "active_gatewaynodes": rows.gn_count,
+        "active_masternodes": rows.mn_count,
+        "active_servicenodes": rows.sn_count,
+        "gatewaynode_reward": rows2.gnrewardamount,
+        "masternode_reward": rows2.mnrewardamount,
+        "servicenode_reward": rows2.snrewardamount
+      }
+    });
+  });
+}
 
 module.exports = app;
