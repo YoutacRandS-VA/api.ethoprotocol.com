@@ -247,7 +247,6 @@ async function getNetworkStats() {
   });
   console.log(rows);
   let networkStorageAvailable = (parseInt(rows[0].gn_count) * 78 + parseInt(rows[0].mn_count) * 38 + parseInt(rows[0].sn_count) * 18) * 1000000000;
-  let res=[];
 
   return {
     "activeUploadContracts": rows[0].pin_count,
