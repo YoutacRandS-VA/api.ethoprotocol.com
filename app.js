@@ -239,12 +239,12 @@ async function getNetworkStats() {
   let sql = "select * from livestats";
   let sql2 = "select * from reward_tracker order by id DESC LIMIT 0, 1";
   
-  rows=await global.pool.query(sql).then(async(rows)=> {
+  let rows=await global.pool.query(sql).then(async(rows)=> {
     return(rows);
   });
-  rows2=await global.pool.query(sql2).then(async(rows2) => {
+  let rows2=await global.pool.query(sql2).then(async(rows2) => {
     let networkStorageAvailable = (parseInt(rows.gn_count) * 78 + parseInt(rows.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
-    return(row2);
+    return(rows2);
   });
   
   return {
