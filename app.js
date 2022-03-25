@@ -243,9 +243,9 @@ async function getNetworkStats() {
     return(rows);
   });
   let rows2=await global.pool.query(sql2).then(async(rows2) => {
-    let networkStorageAvailable = (parseInt(rows.gn_count) * 78 + parseInt(rows.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
     return(rows2);
   });
+  let networkStorageAvailable = (parseInt(rows.gn_count) * 78 + parseInt(rows.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
   
   return {
     "activeUploadContracts": rows.pin_count,
