@@ -249,7 +249,7 @@ async function getNetworkStats() {
   let networkStorageAvailable = (parseInt(rows[0].gn_count) * 78 + parseInt(rows[0].mn_count) * 38 + parseInt(rows[0].sn_count) * 18) * 1000000000;
   let res=[];
   
-  res.push(JSON.stringify("activeUploadContracts:" + rows[0].pin_count));
+  res.push(activeUploadContracts: rows[0].pin_count);
   res.push("networkStorageAvailable:" + networkStorageAvailable);
   res.push("totalNetworkStorageUs:" + networkStorageAvailable / 101.649142);
   res.push("active_gatewaynodes:" + rows[0].gn_count);
