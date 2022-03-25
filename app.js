@@ -242,7 +242,7 @@ async function getNetworkStats() {
   let res = await global.pool.query(sql).then(async(rows)=> {
     let res = await global.pool.query(sql2).then(async(rows2) => {
     
-      let networkStorageAvailable = (parseInt(row.gn_count) * 78 + parseInt(row.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
+      let networkStorageAvailable = (parseInt(rows.gn_count) * 78 + parseInt(rows.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
     
       return {
         "activeUploadContracts": rows.pin_count,
