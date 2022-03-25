@@ -251,14 +251,14 @@ async function getNetworkStats() {
 
   return {
     "activeUploadContracts": rows[0].pin_count,
-    "networkStorageAvailable:" +networkStorageAvailable,
-    "totalNetworkStorageUs:" +networkStorageAvailable / 101.649142,
-    "active_gatewaynodes:" +rows[0].gn_count,
-    "active_masternodes:" +rows[0].mn_count,
-    "active_servicenodes:" +rows[0].sn_count,
-    "gatewaynode_reward:" +rows2[0].gnrewardamount,
-    "masternode_reward:" +rows2[0].mnrewardamount,
-    "servicenode_reward:" +rows2[0].snrewardamount
+    "networkStorageAvailable": networkStorageAvailable,
+    "totalNetworkStorageUs": networkStorageAvailable / 101.649142,
+    "active_gatewaynodes": rows[0].gn_count,
+    "active_masternodes": rows[0].mn_count,
+    "active_servicenodes": rows[0].sn_count,
+    "gatewaynode_reward": rows2[0].gnrewardamount,
+    "masternode_reward": rows2[0].mnrewardamount,
+    "servicenode_reward": rows2[0].snrewardamount
   }
 }
 
