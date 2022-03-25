@@ -239,26 +239,26 @@ async function getNetworkStats() {
   let sql = "select * from livestats";
   let sql2 = "select * from reward_tracker order by id DESC LIMIT 0, 1";
   
-  let res = await global.pool.query(sql).then(async(rows)=> {
-    let res2 = await global.pool.query(sql2).then(async(rows2) => {
-    
-      let networkStorageAvailable = (parseInt(rows.gn_count) * 78 + parseInt(rows.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
-    
-      return {
-        "activeUploadContracts": rows.pin_count,
-        "networkStorageAvailable": networkStorageAvailable,
-        "totalNetworkStorageUs": networkStorageAvailable / 101.649142,
-        "active_gatewaynodes": rows.gn_count,
-        "active_masternodes": rows.mn_count,
-        "active_servicenodes": rows.sn_count,
-        "gatewaynode_reward": rows2.gnrewardamount,
-        "masternode_reward": rows2.mnrewardamount,
-        "servicenode_reward": rows2.snrewardamount
-      }
-    });
-    return(res2);
+  rows=await global.pool.query(sql).then(async(rows)=> {
+    return(rows);
   });
-  return(res);
+  rows2=await global.pool.query(sql2).then(async(rows2) => {
+    let networkStorageAvailable = (parseInt(rows.gn_count) * 78 + parseInt(rows.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
+    return(row2);
+  });
+  
+  return {
+    "activeUploadContracts": rows.pin_count,
+    "networkStorageAvailable": networkStorageAvailable,
+    "totalNetworkStorageUs": networkStorageAvailable / 101.649142,
+    "active_gatewaynodes": rows.gn_count,
+    "active_masternodes": rows.mn_count,
+    "active_servicenodes": rows.sn_count,
+    "gatewaynode_reward": rows2.gnrewardamount,
+    "masternode_reward": rows2.mnrewardamount,
+    "servicenode_reward": rows2.snrewardamount
+  }
+  
 }
 
 module.exports = app;
