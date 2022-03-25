@@ -246,18 +246,18 @@ async function getNetworkStats() {
     return(rows2);
   });
   console.log(rows);
-  let networkStorageAvailable = (parseInt(rows.gn_count) * 78 + parseInt(rows.mn_count) * 38 + parseInt(rows.sn_count) * 18) * 1000000000;
+  let networkStorageAvailable = (parseInt(rows[0].gn_count) * 78 + parseInt(rows[0].mn_count) * 38 + parseInt(rows[0].sn_count) * 18) * 1000000000;
   let res=[];
   
-  res.push("activeUploadContracts:" + rows.pin_count);
+  res.push("activeUploadContracts:" + rows[0].pin_count);
   res.push("networkStorageAvailable:" + networkStorageAvailable);
   res.push("totalNetworkStorageUs:" + networkStorageAvailable / 101.649142);
-  res.push("active_gatewaynodes:" + rows.gn_count);
-  res.push("active_masternodes:" + rows.mn_count);
-  res.push("active_servicenodes:" + rows.sn_count);
-  res.push("gatewaynode_reward:" + rows2.gnrewardamount);
-  res.push("masternode_reward:" + rows2.mnrewardamount);
-  res.push("servicenode_reward:" + rows2.snrewardamount);
+  res.push("active_gatewaynodes:" + rows[0].gn_count);
+  res.push("active_masternodes:" + rows[0].mn_count);
+  res.push("active_servicenodes:" + rows[0].sn_count);
+  res.push("gatewaynode_reward:" + rows2[0].gnrewardamount);
+  res.push("masternode_reward:" + rows2[0].mnrewardamount);
+  res.push("servicenode_reward:" + rows2[0].snrewardamount);
   
   return(res);
   
