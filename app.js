@@ -83,10 +83,10 @@ const routeConfig = {
                 break;
   
               default:
-                return ('Failed');
+                return {status: 500, payload: 'Unsupported action'};
             }
           default:
-            return('Failed');
+            return {status: 500, payload: 'Unsupported module'};
   
         }
       }
@@ -179,9 +179,9 @@ async function getNetworkStats(
   let blockTime = (await web3.eth.getBlock(blockNum).then((res)=>{return(res.timestamp)}) - await web3.eth.getBlock(blockNum - sampleSize).then((res)=>{return(res.timestamp)})) / sampleSize;
   
   return {
-    "blocktime": blockTime,
-    "difficulty": difficulty,
-    "hashrate": difficulty / blockTime,
+    "blocktime": blockTime.toString(),
+    "difficulty": difficulty.toString(),
+    "hashrate": (difficulty / blockTime).toString(),
   };
 }
 
@@ -253,15 +253,15 @@ async function getNetworkStats() {
   let networkStorageAvailable = (parseInt(rows[0].gn_count) * 78 + parseInt(rows[0].mn_count) * 38 + parseInt(rows[0].sn_count) * 18) * 1000000000;
 
   return {
-    "activeUploadContracts": rows[0].pin_count,
-    "networkStorageAvailable": networkStorageAvailable,
-    "totalNetworkStorageUs": networkStorageAvailable / 101.649142,
-    "active_gatewaynodes": rows[0].gn_count,
-    "active_masternodes": rows[0].mn_count,
-    "active_servicenodes": rows[0].sn_count,
-    "gatewaynode_reward": rows2[0].gnrewardamount,
-    "masternode_reward": rows2[0].mnrewardamount,
-    "servicenode_reward": rows2[0].snrewardamount
+    "activeUploadContracts": rows[0].pin_count.toString(),
+    "networkStorageAvailable": networkStorageAvailable.toString(),
+    "totalNetworkStorageUs": (networkStorageAvailable / 101.649142).toString(),
+    "active_gatewaynodes": rows[0].gn_count.toString(),
+    "active_masternodes": rows[0].mn_count.toString(),
+    "active_servicenodes": rows[0].sn_count.toString(),
+    "gatewaynode_reward": rows2[0].gnrewardamount.toString(),
+    "masternode_reward": rows2[0].mnrewardamount.toString(),
+    "servicenode_reward": rows2[0].snrewardamount.toString()
   }
 }
 
