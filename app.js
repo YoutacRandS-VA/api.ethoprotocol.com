@@ -228,8 +228,13 @@ async function getNodeLocations() {
   let res = await global.pool.query(sql).then((rows)=> {
     let response=[];
     let i;
+    let patched_data=[];
     for (i=0;i<rows.length;i++) {
-      response.push(rows[i]);
+      patched_data.id=rows[i].id;
+      patched_data.x=rows[i].x;
+      patched_data.y=rows[i].y;
+      patched_data.nodetype=rows[i].nodettype;
+      response.push(patched_data);
     }
     return((response));
   });
