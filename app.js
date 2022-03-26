@@ -234,6 +234,7 @@ async function getNodeLocations() {
       patched_data.x=rows[i].x;
       patched_data.y=rows[i].y;
       patched_data.nodetype=rows[i].nodettype;
+      console.log(patched_data);
       response.push(patched_data);
     }
     return((response));
