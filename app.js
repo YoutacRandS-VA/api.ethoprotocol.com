@@ -188,10 +188,10 @@ async function getNetworkStats(
 async function getSupply() {
   let coins=0;
   let i=0;
-
-  let monitary_block= [1000000, 1000000, 1700000,300000,800000,200000,1000000,1000000,1000000,1000000,150000, 600000, 250000, 1000000];
-  let monitary_reward= [11, 9.4, 9.4, 8.1, 5.8, 4.7, 3.45, 2.45, 1.9, 11, 1.3, 1.3, 1.05, 1];
-  let monitary_special= [0, 0, 0, 0, 0, 0, 0, 0, 0, 22000000, 0,0, 0, 0];
+  
+  let monitary_block= [1000000, 1000000, 700000,300000,800000,200000,1000000,1000000,1000000, 1000000,150000, 600000, 250000, 1000000, 100000];
+  let monitary_reward= [    13,      11,    9.4,   9.4,   8.1,   5.8,    4.7,   3.45,   2.45,     1.9,    11,    1.3,    1.3,    1.05,      1];
+  let monitary_special= [    0,       0,      0,     0,     0,     0,      0,      0,      0,       0,     0,22000000,      0,       0,      0];
   
   await web3.eth.getBlockNumber()
     .then((result)=> {
@@ -205,6 +205,8 @@ async function getSupply() {
         console.log(coins);
       }
       coins+=result*monitary_reward[i]+monitary_special[i];
+      // Uncle is approx 6.25%
+      coins=parseInt(coins*1.0625);
       console.log(coins);
       })
     .catch((error)=>{
