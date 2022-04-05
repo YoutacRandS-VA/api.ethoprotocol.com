@@ -9,4 +9,43 @@ router.get('/', function(req, res, next) {
   });
 });
 
+/* GET home page. */
+router.get('/totalsupply', async function(req, res, next) {
+  res.render('totalsupply', {
+    title: 'Etho Protocol - Circulating supply' ,
+    supply: await getTotalSupply()
+  });
+});
+
+async function getTotalSupply() {
+  let coins=0;
+  let i=0;
+  
+  let monitary_block= [1000000, 1000000, 700000,300000,800000,200000,1000000,1000000,1000000, 1000000,150000, 600000, 250000, 1000000, 100000];
+  let monitary_reward= [    13,      11,    9.4,   9.4,   8.1,   5.8,    4.7,   3.45,   2.45,     1.9,    11,    1.3,    1.3,    1.05,      1];
+  let monitary_special= [    0,       0,      0,     0,     0,     0,      0,      0,      0,       0,     0,22000000,      0,       0,      0];
+  let blockheight;
+  
+  await web3.eth.getBlockNumber()
+    .then((result)=> {
+      blockheight=result;
+      for (i=0; i<monitary_block.length; i++) {
+        if (result-monitary_block[i]<0)
+          break;
+        else {
+          result-=monitary_block[i];
+          coins+=monitary_reward[i]*monitary_block[i]+monitary_special[i];
+        }
+      }
+      coins+=result*monitary_reward[i]+monitary_special[i];
+      // Uncle is approx 6.25%
+      coins=parseInt(coins*1.0625);
+    })
+    .catch((error)=>{
+      logger.error("#app.getNetworkStats: Error %s", error);
+    })
+  return (coins);
+}
+
+
 module.exports = router;
