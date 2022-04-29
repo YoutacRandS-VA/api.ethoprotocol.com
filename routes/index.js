@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var logger = require('morgan');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -12,8 +13,15 @@ router.get('/', function(req, res, next) {
 /* GET home page. */
 router.get('/totalsupply', async function(req, res, next) {
   res.render('totalsupply', {
-    title: 'Etho Protocol - Circulating supply' ,
+    title: 'Etho Protocol - Total supply' ,
     supply: await getTotalSupply()
+  });
+});
+
+router.get('/circulatingsupply', async function(req, res, next) {
+  res.render('circulatingsupply', {
+    title: 'Etho Protocol - Circulating supply' ,
+    supply: await getCirculatingSupply()
   });
 });
 
@@ -47,5 +55,22 @@ async function getTotalSupply() {
   return (coins);
 }
 
+async function getCirculatingSupply() {
+  let totalsupply;
+  let circulatingsupply;
+  
+  totalsupply=await getTotalSupply();
+
+  console.log("#app.getCirculatingSupply: Supply %s", totalsupply);
+  await web3.eth.getBalance("0xBA57dFe21F78F921F53B83fFE1958Bbab50F6b46")
+    .then(async (result)=> {
+      
+      circulatingsupply=totalsupply-result/1e18;
+    })
+    .catch((error)=>{
+      logger.error("#app.getCirculatingSupply: Error %s", error);
+    })
+  return (circulatingsupply);
+}
 
 module.exports = router;
