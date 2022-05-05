@@ -12,17 +12,16 @@ router.get('/', function(req, res, next) {
 
 /* GET home page. */
 router.get('/totalsupply', async function(req, res, next) {
-  res.render('totalsupply', {
-    title: 'Etho Protocol - Total supply' ,
-    supply: await getTotalSupply()
+    res.type('text/plain');
+    let test=await getTotalSupply();
+    res.send(test.toString());
   });
-});
 
 router.get('/circulatingsupply', async function(req, res, next) {
-  res.render('circulatingsupply', {
-    title: 'Etho Protocol - Circulating supply' ,
-    supply: await getCirculatingSupply()
-  });
+  res.type('text/plain');
+  let test=await getCirculatingSupply();
+  res.send(test.toString());
+  
 });
 
 async function getTotalSupply() {
