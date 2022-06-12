@@ -55,7 +55,7 @@ async function getTotalSupply() {
       // Uncle is approx 3%
       miningcoins=parseInt(miningcoins*1.03);
       othercoins+=monitary_special[i]+(monitary_node[i]+monitary_dev[i])*result;
-      // logger.info("Last remaining blocks %s, Minigcoins tot %s, Coins tot %s", result, miningcoins, coins);
+      logger.info("Current block %s, Miningcoins tot %s, Coins tot %s", blockheight, miningcoins, othercoins);
   
     })
     .catch((error)=>{
