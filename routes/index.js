@@ -53,15 +53,18 @@ async function getTotalSupply() {
       // last arrary element is run here
       miningcoins+=monitary_mining[i]*result;
       // Uncle is approx 3%
-      miningcoins=parseInt(miningcoins*1.03);
+      miningcoins=parseInt(miningcoins*1.0345);
       othercoins+=monitary_special[i]+(monitary_node[i]+monitary_dev[i])*result;
-      logger.info("Current block %s, Miningcoins tot %s, Coins tot %s", blockheight, miningcoins, othercoins);
-  
+      // Remove block 0
+      miningcoins-=monitary_mining[0];
+      othercoins-=(monitary_node[0]+monitary_dev[0]);
+      
+      logger.info("Current block %s, Miningcoins tot %s, Other coins tot %s, Tot coins %s", blockheight, miningcoins, othercoins, parseInt(miningcoins+othercoins));
     })
     .catch((error)=>{
       logger.error("#app.getNetworkStats: Error %s", error);
     })
-  return (miningcoins+othercoins);
+  return (parseInt(miningcoins+othercoins));
 }
 
 async function getCirculatingSupply() {
