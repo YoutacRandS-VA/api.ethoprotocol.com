@@ -2,9 +2,11 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+var logger = require('./logger');
 const NodeRestServer = require('node-rest-server'); // ES5
 const Web3 = require('web3');
+let supply = require("./supply.js");
+
 global.web3 = new Web3(new Web3.providers.HttpProvider('https://rpc.ethoprotocol.com'));
 
 const Database=require('./database');
@@ -18,7 +20,6 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -73,10 +74,10 @@ const routeConfig = {
                 return { status: 200, payload: await getNetworkStats(10) };
                 break;
               case 'supply':
-                return { status: 200, payload: await getSupply() };
+                return { status: 200, payload: await getCirculatingSupply() };
                 break;
               case 'totalsupply':
-                return ('299.0');
+                return { status: 200, payload: await getTotalSupply() };
                 break;
   
               case 'node_locations':
@@ -195,31 +196,16 @@ async function getNetworkStats(
   };
 }
 
-async function getSupply() {
+async function getCirculatingSupply() {
   let coins=0;
-  let i=0;
-  
-  let monitary_block= [1000000, 1000000, 700000,300000,800000,200000,1000000,1000000,1000000, 1000000,150000, 600000, 250000, 1000000, 100000];
-  let monitary_reward= [    13,      11,    9.4,   9.4,   8.1,   5.8,    4.7,   3.45,   2.45,     1.9,    11,    1.3,    1.3,    1.05,      1];
-  let monitary_special= [    0,       0,      0,     0,     0,     0,      0,      0,      0,       0,     0,22000000,      0,       0,      0];
   let blockheight;
   
   await web3.eth.getBlockNumber()
-    .then((result)=> {
+    .then(async (result)=> {
       blockheight=result;
-      for (i=0; i<monitary_block.length; i++) {
-        if (result-monitary_block[i]<0)
-          break;
-        else {
-          result-=monitary_block[i];
-          coins+=monitary_reward[i]*monitary_block[i]+monitary_special[i];
-        }
-        console.log(coins);
-      }
-      coins+=result*monitary_reward[i]+monitary_special[i];
-      // Uncle is approx 6.25%
-      coins=parseInt(coins*1.0625);
-      })
+      coins=await supply.getCirculationSupply();
+  
+    })
     .catch((error)=>{
       logger.error("#app.getNetworkStats: Error %s", error);
     })
@@ -228,40 +214,27 @@ async function getSupply() {
     "CirculatingSupply": coins.toString(),
   }
   
-  
 }
 
 async function getTotalSupply() {
   let coins=0;
-  let i=0;
-  
-  let monitary_block= [1000000, 1000000, 700000,300000,800000,200000,1000000,1000000,1000000, 1000000,150000, 600000, 250000, 1000000, 100000];
-  let monitary_reward= [    13,      11,    9.4,   9.4,   8.1,   5.8,    4.7,   3.45,   2.45,     1.9,    11,    1.3,    1.3,    1.05,      1];
-  let monitary_special= [    0,       0,      0,     0,     0,     0,      0,      0,      0,       0,     0,22000000,      0,       0,      0];
   let blockheight;
   
   await web3.eth.getBlockNumber()
-    .then((result)=> {
+    .then(async (result)=> {
       blockheight=result;
-      for (i=0; i<monitary_block.length; i++) {
-        if (result-monitary_block[i]<0)
-          break;
-        else {
-          result-=monitary_block[i];
-          coins+=monitary_reward[i]*monitary_block[i]+monitary_special[i];
-        }
-        console.log(coins);
-      }
-      coins+=result*monitary_reward[i]+monitary_special[i];
-      // Uncle is approx 6.25%
-      coins=parseInt(coins*1.0625);
+      coins=await supply.getTotalSupply();
+      
     })
     .catch((error)=>{
       logger.error("#app.getNetworkStats: Error %s", error);
+      
     })
   return {
-    coins
+    "BlockHeight": blockheight.toString(),
+    "TotalSupply": coins.toString(),
   }
+  
 }
 
 async function getNodeLocations() {
