@@ -9,10 +9,13 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "got": "^9.6.0",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
+    "mysql": "^2.18.1",
     "node-rest-server": "^3.1.0",
     "pug": "2.0.0-beta11",
-    "web3": "^1.7.1"
+    "web3": "^1.7.1",
+    "winston": "^3.6.0"
   }
 }

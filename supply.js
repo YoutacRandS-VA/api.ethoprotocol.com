@@ -1,25 +1,36 @@
 
 const logger = require("./logger");
-
+const got = require("got");
 
 const supply = module.exports = {
   // Circulating supply is Total supply - dev found - staked etho
   getCirculationSupply: async function () {
     let totalsupply;
     let circulatingsupply;
+    let stakingsupply;
   
     totalsupply=await supply.getTotalSupply();
   
     console.log("#app.getCirculatingSupply: Supply %s", totalsupply);
+    await got('https://nodes.ethoprotocol.com/ethofsapi.php?api=node_locked_amount')
+      .then((res) => {
+        logger.info("#supply.getCirculationSupply: %s",res.body);
+        stakingsupply=parseInt(res.body);
+      })
+      .catch((error)=>{
+        logger.error("#supply.getCirculatingSupply: Error %s", error);
+      })
+  
+  
     await web3.eth.getBalance("0xBA57dFe21F78F921F53B83fFE1958Bbab50F6b46")
       .then(async (result)=> {
-      
-        circulatingsupply=totalsupply-result/1e18;
+       
+        circulatingsupply=totalsupply-stakingsupply-result/1e18;
       })
       .catch((error)=>{
         logger.error("#app.getCirculatingSupply: Error %s", error);
       })
-    return (circulatingsupply);
+    return (parseInt(circulatingsupply));
   },
   getTotalSupply: async function () {
   let othercoins=0;
