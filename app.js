@@ -277,7 +277,7 @@ async function getNetworkStats() {
   return {
     "activeUploadContracts": rows[0].pin_count.toString(),
     "networkStorageAvailable": networkStorageAvailable.toString(),
-    "totalNetworkStorageUs": (networkStorageAvailable / 101.649142).toString(),
+    "totalNetworkStorageUse": (networkStorageAvailable / 101.649142).toString(),
     "active_gatewaynodes": rows[0].gn_count.toString(),
     "active_masternodes": rows[0].mn_count.toString(),
     "active_servicenodes": rows[0].sn_count.toString(),
