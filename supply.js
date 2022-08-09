@@ -24,8 +24,10 @@ const supply = module.exports = {
   
     await web3.eth.getBalance("0xBA57dFe21F78F921F53B83fFE1958Bbab50F6b46")
       .then(async (result)=> {
-       
-        circulatingsupply=totalsupply-stakingsupply-result/1e18;
+  
+        // Changes after discussion in the team 20220809
+        // circulatingsupply=totalsupply-stakingsupply-result/1e18;
+        circulatingsupply=totalsupply-result/1e18;
       })
       .catch((error)=>{
         logger.error("#app.getCirculatingSupply: Error %s", error);

@@ -19,7 +19,7 @@ router.get('/totalsupply', async function(req, res, next) {
 
 router.get('/circulatingsupply', async function(req, res, next) {
   res.type('text/plain');
-  let test=await supply.getCirculatingSupply();
+  let test=await supply.getCirculationSupply();
   res.send(test.toString());
   
 });
