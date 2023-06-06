@@ -264,6 +264,7 @@ async function getNetworkStats() {
   
   let sql = "select * from livestats";
   let sql2 = "select * from reward_tracker order by id DESC LIMIT 0, 1";
+  let sql3 = "select * from nodestats order by id DESC LIMIT 0, 1";
   
   let rows=await global.pool.query(sql).then(async(rows)=> {
     return(rows);
@@ -271,6 +272,10 @@ async function getNetworkStats() {
   let rows2=await global.pool.query(sql2).then(async(rows2) => {
     return(rows2);
   });
+  let rows3=await global.pool.query(sql3).then(async(rows3) => {
+    return(rows3);
+  });
+  
   console.log(rows);
   let networkStorageAvailable = (parseInt(rows[0].gn_count) * 78 + parseInt(rows[0].mn_count) * 38 + parseInt(rows[0].sn_count) * 18) * 1000000000;
 
@@ -278,9 +283,9 @@ async function getNetworkStats() {
     "activeUploadContracts": rows[0].pin_count.toString(),
     "networkStorageAvailable": networkStorageAvailable.toString(),
     "totalNetworkStorageUse": (networkStorageAvailable / 101.649142).toString(),
-    "active_gatewaynodes": rows[0].gn_count.toString(),
-    "active_masternodes": rows[0].mn_count.toString(),
-    "active_servicenodes": rows[0].sn_count.toString(),
+    "active_gatewaynodes": rows3[0].gn_count.toString(),
+    "active_masternodes": rows3[0].mn_count.toString(),
+    "active_servicenodes": rows3[0].sn_count.toString(),
     "gatewaynode_reward": rows2[0].gnrewardamount.toString(),
     "masternode_reward": rows2[0].mnrewardamount.toString(),
     "servicenode_reward": rows2[0].snrewardamount.toString()
